@@ -1,14 +1,17 @@
 package com.example.sneakpeek;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 
 public class User {
 
 	@Id
-	public String id;
+	private String id;
 
-	public String firstName;
-	public String lastName;
+	private String firstName;
+	private String lastName;
+	private List<Item> closet;
 
 	public User(String firstName, String lastName) {
 		this.firstName = firstName;
