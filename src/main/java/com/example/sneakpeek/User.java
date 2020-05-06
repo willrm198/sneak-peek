@@ -1,9 +1,11 @@
 package com.example.sneakpeek;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document(collection="Users")
 public class User {
 
 	@Id
@@ -11,21 +13,31 @@ public class User {
 
 	private String firstName;
 	private String lastName;
-	private List<Item> closet;
+	private ArrayList<Item> closet;
+	
 
-	public User(String firstName, String lastName) {
+	public User(String firstName, String lastName, ArrayList<Item> closet) {
 		this.firstName = firstName;
 		this.lastName = lastName;
+		this.closet = closet;
+	}
+	
+	public User() {
+		
 	}
 
 	public String getFirstName() {
-		return firstName;
+		return this.firstName;
 	}
 
 	public String getLastName() {
-		return lastName;
+		return this.lastName;
 	}
 
+	public ArrayList<Item> getCloset(){
+		return this.closet;
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("User[id=%s, firstName='%s', lastName='%s']", id, firstName, lastName);
