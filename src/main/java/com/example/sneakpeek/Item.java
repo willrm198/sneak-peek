@@ -25,15 +25,31 @@ public class Item {
 		return this.itemType;
 	}
 	
+	public void setItemType(String itemType) {
+		this.itemType = itemType;
+	}
+	
 	public String getItemName() {
 		return this.itemName;
+	}
+	
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
 	}
 	
 	public String getItemDescription() {
 		return this.itemDescription;
 	}
 	
+	public void setItemDescription(String itemDescription) {
+		this.itemDescription = itemDescription;
+	}
+	
 	public String getItemVisibility() {
 		return this.itemVisibility;
+	}
+	
+	public void setItemVisibility(String itemVisibility) {
+		this.itemVisibility = itemVisibility;
 	}
 }

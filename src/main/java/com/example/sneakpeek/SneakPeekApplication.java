@@ -26,7 +26,7 @@ public class SneakPeekApplication implements CommandLineRunner{
 		Item item = new Item("shoe", "Adidas", "This is a description", "public");
 		list.add(item);
 		
-		User user = new User("Frank", "Coleman", list);
+		User user = new User("Frank", "Coleman", "fCole123", list);
 		
 		userRepos.save(user);
 		System.out.println("_____USER SAVED_____");
