@@ -8,9 +8,9 @@ public class Item {
 	public String itemType;
 	public String itemName;
 	public String itemDescription;
-	public String itemVisibility;
+	public boolean itemVisibility;
 
-	public Item(String itemType, String itemName, String itemDescription, String itemVisibility) {
+	public Item(String itemType, String itemName, String itemDescription, boolean itemVisibility) {
 		this.itemType = itemType;
 		this.itemName = itemName;
 		this.itemDescription = itemDescription;
@@ -45,11 +45,11 @@ public class Item {
 		this.itemDescription = itemDescription;
 	}
 	
-	public String getItemVisibility() {
+	public boolean getItemVisibility() {
 		return this.itemVisibility;
 	}
 	
-	public void setItemVisibility(String itemVisibility) {
+	public void setItemVisibility(boolean itemVisibility) {
 		this.itemVisibility = itemVisibility;
 	}
 }

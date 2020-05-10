@@ -1,5 +1,6 @@
 package com.example.sneakpeek;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,18 +21,37 @@ public class SneakPeekController {
 	private UserRepository userRepository;
 
 	@GetMapping("/User")
-	public List<User> getUsers(){
-		return userRepository.findAll();
+	public UserResponse getUsers(){
+		List<User> users = userRepository.findAll();
+		String message;
+		
+		if(users.size() == 0) {
+			message = "No users found.";
+		}
+		else if(users.size() == 1) {
+			message = "One user found.";
+		}
+		else if (users.size() > 1 && users.size() < 5) {
+			message = "A few users found.";
+		}
+		else {
+			message = "Many users found.";
+		}
+		return new UserResponse(message, users);
 	}
 	
 	@GetMapping("/User/{userName}")
-	public User getUserByFName(@PathVariable String userName) {
-		return userRepository.findByUserName(userName);
+	public UserResponse getUserByFName(@PathVariable String userName) {
+		List<User> list = new ArrayList<User>();
+		list.add(userRepository.findByUserName(userName));
+		
+		return new UserResponse("User found." , list);
 	}
 
 	@PostMapping(path = "/createUser", consumes = "application/json", produces = "application/json")
-	public void createUser(@RequestBody User user) {
+	public String createUser(@RequestBody User user) {
 		userRepository.save(user);
+		return String.format("User %s created!", user.getUserName().toUpperCase());
 	}
 	
 	@PutMapping(path = "/User/{userName}", consumes = "application/json", produces = "application/json")
@@ -51,3 +71,8 @@ public class SneakPeekController {
 		userRepository.deleteById(id);
 	}
 }
+
+
+//Make sure POST can read the body of a request -- validate by sending a body back with a 200 response, 
+//that ALL CAPS some value in the request body (i.e. request contains {name: 'sheree', age: 56}, response 
+//		should contain at minimum {name: "SHEREE"})
