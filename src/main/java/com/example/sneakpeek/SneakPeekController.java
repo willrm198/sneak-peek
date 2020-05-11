@@ -2,6 +2,7 @@ package com.example.sneakpeek;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -70,9 +71,33 @@ public class SneakPeekController {
 		String id = userRepository.findByUserName(userName).getId();
 		userRepository.deleteById(id);
 	}
+	
+	@PostMapping(path = "Closet/{userName}", consumes = "application/json", produces = "application/json")
+	public User addClosetItem(@PathVariable String userName, @RequestBody Item item) {
+		User user = userRepository.findByUserName(userName);
+		
+		ArrayList<Item> closet = user.getCloset();
+		closet.add(item);
+		
+		user.setCloset(closet);
+		userRepository.save(user);
+		
+		return user;
+	}
+	
+	@GetMapping(path = "Closet/{userName}")
+	public List<Item> getCloset(@PathVariable String userName) {
+		//return users closet where item visibility = true
+		
+		User user = userRepository.findByUserName(userName);
+		ArrayList<Item> closet = user.getCloset();
+		
+		List<Item> visibleCloset = closet
+				.stream()
+				.filter(c -> c.getItemVisibility() == true)
+				.collect(Collectors.toList());
+
+		return visibleCloset;
+	}
 }
 
-
-//Make sure POST can read the body of a request -- validate by sending a body back with a 200 response, 
-//that ALL CAPS some value in the request body (i.e. request contains {name: 'sheree', age: 56}, response 
-//		should contain at minimum {name: "SHEREE"})
