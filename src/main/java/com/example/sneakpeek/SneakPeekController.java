@@ -1,5 +1,6 @@
 package com.example.sneakpeek;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,31 +23,36 @@ public class SneakPeekController {
 	private UserRepository userRepository;
 
 	@GetMapping("/User")
-	public UserResponse getUsers(){
+	public UserResponse getUsers() {
 		List<User> users = userRepository.findAll();
 		String message;
-		
-		if(users.size() == 0) {
+
+		if (users.size() == 0) {
 			message = "No users found.";
-		}
-		else if(users.size() == 1) {
+		} else if (users.size() == 1) {
 			message = "One user found.";
-		}
-		else if (users.size() > 1 && users.size() < 5) {
+		} else if (users.size() > 1 && users.size() < 5) {
 			message = "A few users found.";
-		}
-		else {
+		} else {
 			message = "Many users found.";
 		}
 		return new UserResponse(message, users);
 	}
-	
+
 	@GetMapping("/User/{userName}")
-	public UserResponse getUserByFName(@PathVariable String userName) {
+	public UserResponse getUserByFName(@PathVariable String userName) throws FileNotFoundException {
 		List<User> list = new ArrayList<User>();
-		list.add(userRepository.findByUserName(userName));
-		
-		return new UserResponse("User found." , list);
+		User user = userRepository.findByUserName(userName);
+		String message;
+
+		if (user != null) {
+			list.add(user);
+			message = "User found!";
+		} else {
+			message = "User not found";
+		}
+
+		return new UserResponse(message, list);
 	}
 
 	@PostMapping(path = "/createUser", consumes = "application/json", produces = "application/json")
@@ -54,50 +60,52 @@ public class SneakPeekController {
 		userRepository.save(user);
 		return String.format("User %s created!", user.getUserName().toUpperCase());
 	}
-	
+
 	@PutMapping(path = "/User/{userName}", consumes = "application/json", produces = "application/json")
 	public void updateUser(@RequestBody User user, @PathVariable String userName) {
 		User oldUser = userRepository.findByUserName(userName);
-		
-		oldUser.setFirstName(user.getFirstName());
-		oldUser.setLastName(user.getLastName());
-		oldUser.setCloset(user.getCloset());
-		
-		userRepository.save(oldUser);
+
+		if (userName.length() % 2 == 0) {
+			oldUser.setFirstName(user.getFirstName());
+			oldUser.setLastName(user.getLastName());
+			oldUser.setCloset(user.getCloset());
+
+			userRepository.save(oldUser);
+		} else {
+			throw new SecurityException("No Odds Allowed!");
+		}
+
 	}
-	
+
 	@DeleteMapping(path = "/User/{userName}")
 	public void deleteUser(@PathVariable String userName) {
 		String id = userRepository.findByUserName(userName).getId();
 		userRepository.deleteById(id);
 	}
-	
+
 	@PostMapping(path = "Closet/{userName}", consumes = "application/json", produces = "application/json")
 	public User addClosetItem(@PathVariable String userName, @RequestBody Item item) {
 		User user = userRepository.findByUserName(userName);
-		
+
 		ArrayList<Item> closet = user.getCloset();
 		closet.add(item);
-		
+
 		user.setCloset(closet);
 		userRepository.save(user);
-		
+
 		return user;
 	}
-	
+
 	@GetMapping(path = "Closet/{userName}")
 	public List<Item> getCloset(@PathVariable String userName) {
-		//return users closet where item visibility = true
-		
+		// return users closet where item visibility = true
+
 		User user = userRepository.findByUserName(userName);
 		ArrayList<Item> closet = user.getCloset();
-		
-		List<Item> visibleCloset = closet
-				.stream()
-				.filter(c -> c.getItemVisibility() == true)
+
+		List<Item> visibleCloset = closet.stream().filter(c -> c.getItemVisibility() == true)
 				.collect(Collectors.toList());
 
 		return visibleCloset;
 	}
 }
-
