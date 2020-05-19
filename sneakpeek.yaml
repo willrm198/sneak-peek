@@ -1,0 +1,197 @@
+openapi: 3.0.0
+info: 
+  title: Sneak Peek
+  description: Sneak Peek online closet application
+  version: 0.1.9
+  
+servers:
+  - url: http://localhost:8080
+    description: local endpoint
+tags:
+  - name: "user"
+    description: "Access users"
+  - name: "closet"
+    description: "Access users closet"
+
+  
+paths: 
+  /User:
+    get:
+      tags:
+      - "user"
+      summary: returns all users
+      responses: 
+        '200':
+          description: OK. Returns a response object containing a message and list of users
+          content:
+           application/json:
+              schema: 
+                $ref: '#/components/schemas/UserResponse'
+                
+  /User/{username}:
+    get:
+      tags:
+      - "user"
+      summary: returns user by username
+      parameters: 
+        - in: path
+          name: username
+          required: true
+          description: username of user to search
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK. Returns a response object containing a message and the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+    put:
+      tags:
+      - "user"
+      summary: update user
+      parameters:
+      - in: path
+        name: username
+        required: true
+        description: username of user to update
+        schema: 
+          type: string
+      requestBody:
+        required: true
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: updated
+        '403':
+          description: forbidden 
+    delete:
+      tags:
+      - "user"
+      summary: delete user
+      parameters: 
+        - in: path
+          name: username
+          required: true
+          description: username of user to delete
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: User Deleted
+          
+  /Closet/{username}:
+    get:
+      tags:
+      - "closet"
+      summary: get users closet of only visible items
+      parameters: 
+        - in: path
+          name: username
+          required: true
+          description: username of user closet to update
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of users items (closet)
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ClosetItem:
+                      $ref: '#/components/schemas/ClosetItem'
+    post:
+      tags:
+      - "closet"
+      summary: adds item to user closet
+      parameters: 
+        - in: path
+          name: username
+          required: true
+          description: username of user closet to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClosetItem'
+      responses:
+        '200': 
+          description: item added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /createUser:
+    post:
+      tags:
+      - "user"
+      summary: create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+             $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: created
+          content:
+            application/json:
+              schema:
+                type: string
+              
+components:
+  schemas:
+    ClosetItem:
+      properties: 
+        itemType: 
+          type: string
+        itemName:
+          type: string
+        itemDescription:
+          type: string
+        itemVisibility:
+          type: boolean
+            
+    User:
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        closet:
+          type: array
+          items: 
+            type: object
+            properties:
+              item:
+               $ref: '#/components/schemas/ClosetItem'
+    UserResponse:
+      properties:
+         message:
+          type: string
+          example: Many users found!
+         users:
+          type: array
+          items:
+            type: object
+            properties:
+              user:
+                $ref: '#/components/schemas/User'
+        
+    
