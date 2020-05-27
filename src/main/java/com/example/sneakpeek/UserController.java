@@ -1,9 +1,7 @@
 package com.example.sneakpeek;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.sneakpeek.UserRepository;
 
 @RestController
-public class SneakPeekController {
-
+public class UserController {
+	
 	@Autowired
 	private UserRepository userRepository;
 
@@ -40,7 +38,7 @@ public class SneakPeekController {
 	}
 
 	@GetMapping("/User/{userName}")
-	public UserResponse getUserByFName(@PathVariable String userName) throws FileNotFoundException {
+	public UserResponse getUserByFName(@PathVariable String userName) {
 		List<User> list = new ArrayList<User>();
 		User user = userRepository.findByUserName(userName);
 		String message;
@@ -68,7 +66,6 @@ public class SneakPeekController {
 		if (userName.length() % 2 == 0) {
 			oldUser.setFirstName(user.getFirstName());
 			oldUser.setLastName(user.getLastName());
-			oldUser.setCloset(user.getCloset());
 
 			userRepository.save(oldUser);
 		} else {
@@ -81,31 +78,5 @@ public class SneakPeekController {
 	public void deleteUser(@PathVariable String userName) {
 		String id = userRepository.findByUserName(userName).getId();
 		userRepository.deleteById(id);
-	}
-
-	@PostMapping(path = "Closet/{userName}", consumes = "application/json", produces = "application/json")
-	public User addClosetItem(@PathVariable String userName, @RequestBody Item item) {
-		User user = userRepository.findByUserName(userName);
-
-		ArrayList<Item> closet = user.getCloset();
-		closet.add(item);
-
-		user.setCloset(closet);
-		userRepository.save(user);
-
-		return user;
-	}
-
-	@GetMapping(path = "Closet/{userName}")
-	public List<Item> getCloset(@PathVariable String userName) {
-		// return users closet where item visibility = true
-
-		User user = userRepository.findByUserName(userName);
-		ArrayList<Item> closet = user.getCloset();
-
-		List<Item> visibleCloset = closet.stream().filter(c -> c.getItemVisibility() == true)
-				.collect(Collectors.toList());
-
-		return visibleCloset;
 	}
 }

@@ -93,7 +93,7 @@ paths:
         - in: path
           name: username
           required: true
-          description: username of user closet to update
+          description: username of user closet to view
           schema:
             type: string
       responses:
@@ -155,6 +155,10 @@ components:
   schemas:
     ClosetItem:
       properties: 
+        itemId:
+          type: string
+        userId:
+          type: string
         itemType: 
           type: string
         itemName:
@@ -174,13 +178,7 @@ components:
           type: string
         lastName:
           type: string
-        closet:
-          type: array
-          items: 
-            type: object
-            properties:
-              item:
-               $ref: '#/components/schemas/ClosetItem'
+       
     UserResponse:
       properties:
          message:

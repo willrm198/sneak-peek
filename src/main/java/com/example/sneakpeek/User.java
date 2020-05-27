@@ -1,7 +1,5 @@
 package com.example.sneakpeek;
 
-import java.util.ArrayList;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,13 +15,14 @@ public class User {
 
 	private String firstName;
 	private String lastName;
-	private ArrayList<Item> closet;
+	
+	//private ArrayList<Item> closet;
 
-	public User(String firstName, String lastName, String userName, ArrayList<Item> closet) {
+	public User(String firstName, String lastName, String userName) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.userName = userName;
-		this.closet = closet;
+		//this.closet = closet;
 	}
 
 	public User() {
@@ -56,14 +55,6 @@ public class User {
 
 	public void setLastName(String lName) {
 		this.lastName = lName;
-	}
-
-	public ArrayList<Item> getCloset() {
-		return this.closet;
-	}
-
-	public void setCloset(ArrayList<Item> closet) {
-		this.closet = closet;
 	}
 
 	@Override
