@@ -3,6 +3,8 @@ package com.example.sneakpeek;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.directory.InvalidAttributeValueException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +40,7 @@ public class UserController {
 	}
 
 	@GetMapping("/User/{userName}")
-	public UserResponse getUserByFName(@PathVariable String userName) {
+	public UserResponse getUser(@PathVariable String userName) {
 		List<User> list = new ArrayList<User>();
 		User user = userRepository.findByUserName(userName);
 		String message;
@@ -54,16 +56,29 @@ public class UserController {
 	}
 
 	@PostMapping(path = "/createUser", consumes = "application/json", produces = "application/json")
-	public String createUser(@RequestBody User user) {
+	public String createUser(@RequestBody User user) throws InvalidAttributeValueException {
+		if(user.getFirstName() == null) {
+			throw new InvalidAttributeValueException("firstName cannot be null or integer!");
+		}
+		else if(user.getLastName() == null) {
+			throw new InvalidAttributeValueException("lastName cannot be null or integer!");
+		}
+		else if(user.getUserName() == null) {
+			throw new InvalidAttributeValueException("username cannot be null or integer!");
+		}
+			
 		userRepository.save(user);
+		
 		return String.format("User %s created!", user.getUserName().toUpperCase());
 	}
 
-	@PutMapping(path = "/User/{userName}", consumes = "application/json", produces = "application/json")
-	public void updateUser(@RequestBody User user, @PathVariable String userName) {
-		User oldUser = userRepository.findByUserName(userName);
+	@PutMapping(path = "/User", consumes = "application/json", produces = "application/json")
+	public UserResponse updateUser(@RequestBody User user) {
+		String username = user.getUserName();
+		
+		User oldUser = userRepository.findByUserName(username);
 
-		if (userName.length() % 2 == 0) {
+		if (username.length() % 2 == 0) {
 			oldUser.setFirstName(user.getFirstName());
 			oldUser.setLastName(user.getLastName());
 
@@ -71,7 +86,10 @@ public class UserController {
 		} else {
 			throw new SecurityException("No Odds Allowed!");
 		}
-
+		List<User> list = new ArrayList<User>();
+		list.add(oldUser);
+		
+		return new UserResponse("User updated!", list);
 	}
 
 	@DeleteMapping(path = "/User/{userName}")

@@ -21,9 +21,12 @@ public class ClosetController {
 	@Autowired
 	private ItemRepository itemRepository;
 	
-	@PostMapping(path = "Closet/{userName}", consumes = "application/json", produces = "application/json")
-	public List<ClosetItem> addClosetItem(@PathVariable String userName, @RequestBody ClosetItem item) {
-		User user = userRepository.findByUserName(userName);
+	@PostMapping(path = "/Closet", consumes = "application/json", produces = "application/json")
+	public List<ClosetItem> addClosetItem(@RequestBody ClosetRequest closetReq) {
+		String username = closetReq.getUsername();
+		ClosetItem item = closetReq.getClosetItem();
+		
+		User user = userRepository.findByUserName(username);
 		String userID = user.getId();
 		
 		ClosetItem newItem = new ClosetItem(userID, item.itemType, item.itemName, item.itemDescription, item.itemVisibility);
@@ -32,7 +35,7 @@ public class ClosetController {
 		return itemRepository.findByUserId(userID);
 	}
 
-	@GetMapping(path = "Closet/{userName}")
+	@GetMapping(path = "/Closet/{userName}")
 	public List<ClosetItem> getCloset(@PathVariable String userName) {
 		// return users closet where item visibility = true
 

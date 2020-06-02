@@ -4,10 +4,10 @@ import java.util.List;
 
 public class UserResponse {
 
-	String message;
-	List<User> users;
+	private String message;
+	private List<User> users;
 
-	UserResponse(String message, List<User> users) {
+	public UserResponse(String message, List<User> users) {
 		this.message = message;
 		this.users = users;
 	}

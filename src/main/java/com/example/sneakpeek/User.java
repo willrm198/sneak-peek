@@ -16,13 +16,12 @@ public class User {
 	private String firstName;
 	private String lastName;
 	
-	//private ArrayList<Item> closet;
+	
 
 	public User(String firstName, String lastName, String userName) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.userName = userName;
-		//this.closet = closet;
 	}
 
 	public User() {
