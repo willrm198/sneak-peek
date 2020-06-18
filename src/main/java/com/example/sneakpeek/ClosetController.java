@@ -17,34 +17,36 @@ public class ClosetController {
 
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private ItemRepository itemRepository;
-	
+
 	@PostMapping(path = "/Closet", consumes = "application/json", produces = "application/json")
-	public List<ClosetItem> addClosetItem(@RequestBody ClosetRequest closetReq) {
+	public ClosetResponse addClosetItem(@RequestBody ClosetRequest closetReq) {
 		String username = closetReq.getUsername();
 		ClosetItem item = closetReq.getClosetItem();
-		
+
 		User user = userRepository.findByUserName(username);
 		String userID = user.getId();
-		
-		ClosetItem newItem = new ClosetItem(userID, item.itemType, item.itemName, item.itemDescription, item.itemVisibility);
+
+		ClosetItem newItem = new ClosetItem(userID, item.itemSize, item.itemBrand, item.itemModel, item.itemDescription,
+				item.itemIsVisible);
 		itemRepository.save(newItem);
 
-		return itemRepository.findByUserId(userID);
+		return new ClosetResponse("Closet Item Added!", itemRepository.findByUserId(userID));
 	}
 
 	@GetMapping(path = "/Closet/{userName}")
-	public List<ClosetItem> getCloset(@PathVariable String userName) {
+	public ClosetResponse getCloset(@PathVariable String userName) {
 		// return users closet where item visibility = true
 
 		User user = userRepository.findByUserName(userName);
 		List<ClosetItem> closet = itemRepository.findByUserId(user.getId());
 
-		List<ClosetItem> visibleCloset = closet.stream().filter(c -> c.getItemVisibility() == true)
+		List<ClosetItem> visibleCloset = closet.stream().filter(c -> c.getitemIsVisible() == true)
 				.collect(Collectors.toList());
 
-		return visibleCloset;
+		String message = visibleCloset.isEmpty() ? "No closet found!" : "Closet found!";
+		return new ClosetResponse(message, visibleCloset);
 	}
 }

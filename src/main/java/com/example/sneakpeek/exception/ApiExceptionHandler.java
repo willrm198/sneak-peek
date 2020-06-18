@@ -19,12 +19,12 @@ public class ApiExceptionHandler {
 
 		return new ResponseEntity<>(exception, HttpStatus.FORBIDDEN);
 	}
-	
+
 	@ExceptionHandler(value = InvalidAttributeValueException.class)
-	public ResponseEntity<Object> handleInvalidAttributeValueExceptionException(InvalidAttributeValueException e){
-		
+	public ResponseEntity<Object> handleInvalidAttributeValueExceptionException(InvalidAttributeValueException e) {
+
 		ApiException exception = new ApiException(e.getMessage(), HttpStatus.BAD_REQUEST, ZonedDateTime.now());
-		
+
 		return new ResponseEntity<>(exception, HttpStatus.BAD_REQUEST);
 	}
 }

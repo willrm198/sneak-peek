@@ -12,11 +12,8 @@ public class User {
 
 	@Indexed(unique = true)
 	private String userName;
-
 	private String firstName;
 	private String lastName;
-	
-	
 
 	public User(String firstName, String lastName, String userName) {
 		this.firstName = firstName;

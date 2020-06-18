@@ -7,19 +7,22 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ClosetItem {
 	@Id
 	public String itemId;
-	
-	public String userId;
-	public String itemType;
-	public String itemName;
-	public String itemDescription;
-	public boolean itemVisibility;
 
-	public ClosetItem(String userId, String itemType, String itemName, String itemDescription, boolean itemVisibility) {
+	public String userId;
+	public Double itemSize;
+	public String itemBrand;
+	public String itemModel;
+	public String itemDescription;
+	public boolean itemIsVisible;
+
+	public ClosetItem(String userId, Double itemSize, String itemBrand, String itemModel, String itemDescription,
+			boolean itemIsVisible) {
 		this.userId = userId;
-		this.itemType = itemType;
-		this.itemName = itemName;
+		this.itemSize = itemSize;
+		this.itemBrand = itemBrand;
+		this.itemModel = itemModel;
 		this.itemDescription = itemDescription;
-		this.itemVisibility = itemVisibility;
+		this.itemIsVisible = itemIsVisible;
 	}
 
 	public ClosetItem() {
@@ -29,29 +32,37 @@ public class ClosetItem {
 	public String getItemId() {
 		return this.itemId;
 	}
-	
+
 	public String getUserId() {
 		return this.userId;
 	}
-	
+
 	public String setUserId() {
 		return this.userId;
 	}
-	
-	public String getItemType() {
-		return this.itemType;
+
+	public Double getItemSize() {
+		return this.itemSize;
 	}
 
-	public void setItemType(String itemType) {
-		this.itemType = itemType;
+	public void setItemUsSize(Double itemSize) {
+		this.itemSize = itemSize;
 	}
 
-	public String getItemName() {
-		return this.itemName;
+	public String getItemBrand() {
+		return this.itemBrand;
 	}
 
-	public void setItemName(String itemName) {
-		this.itemName = itemName;
+	public void setItemBrand(String itemBrand) {
+		this.itemBrand = itemBrand;
+	}
+
+	public String getItemModel() {
+		return this.itemModel;
+	}
+
+	public void setItemModel(String itemModel) {
+		this.itemModel = itemModel;
 	}
 
 	public String getItemDescription() {
@@ -62,11 +73,11 @@ public class ClosetItem {
 		this.itemDescription = itemDescription;
 	}
 
-	public boolean getItemVisibility() {
-		return this.itemVisibility;
+	public boolean getitemIsVisible() {
+		return this.itemIsVisible;
 	}
 
-	public void setItemVisibility(boolean itemVisibility) {
-		this.itemVisibility = itemVisibility;
+	public void setitemIsVisible(boolean itemIsVisible) {
+		this.itemIsVisible = itemIsVisible;
 	}
 }
