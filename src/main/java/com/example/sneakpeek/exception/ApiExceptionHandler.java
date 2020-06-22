@@ -1,5 +1,6 @@
 package com.example.sneakpeek.exception;
 
+import java.security.InvalidParameterException;
 import java.time.ZonedDateTime;
 
 import javax.naming.directory.InvalidAttributeValueException;
@@ -21,7 +22,15 @@ public class ApiExceptionHandler {
 	}
 
 	@ExceptionHandler(value = InvalidAttributeValueException.class)
-	public ResponseEntity<Object> handleInvalidAttributeValueExceptionException(InvalidAttributeValueException e) {
+	public ResponseEntity<Object> handleInvalidAttributeValueException(InvalidAttributeValueException e) {
+
+		ApiException exception = new ApiException(e.getMessage(), HttpStatus.BAD_REQUEST, ZonedDateTime.now());
+
+		return new ResponseEntity<>(exception, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(value = InvalidParameterException.class)
+	public ResponseEntity<Object> handleInvalidParameterException(InvalidParameterException e) {
 
 		ApiException exception = new ApiException(e.getMessage(), HttpStatus.BAD_REQUEST, ZonedDateTime.now());
 
