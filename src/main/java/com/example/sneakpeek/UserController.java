@@ -1,6 +1,8 @@
 package com.example.sneakpeek;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.naming.directory.InvalidAttributeValueException;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.sneakpeek.UserRepository;
@@ -23,22 +26,49 @@ public class UserController {
 	private UserRepository userRepository;
 
 	@GetMapping("/User")
-	public UserResponse getUsers() {
+	public UserResponse getUsers(@RequestParam(name = "sortField", required = false, defaultValue = "username") String sortField,
+			@RequestParam(name = "sortDir", required = false, defaultValue = "asc") String sortDir) {
 		List<User> users = userRepository.findAll();
-		String message;
-
-		if (users.size() == 0) {
-			message = "No users found.";
-		} else if (users.size() == 1) {
-			message = "One user found.";
-		} else if (users.size() > 1 && users.size() < 5) {
-			message = "A few users found.";
-		} else {
-			message = "Many users found.";
-		}
-		return new UserResponse(message, users);
+		String message = users.isEmpty() ? "No users found." : "User(s) found!";
+		
+		List<User> sortedList = sortUsers(users, sortField, sortDir);
+		return new UserResponse(message, sortedList);
 	}
 
+	public List<User> sortUsers(List<User> users, String field, String direction) {
+		
+		if (direction.compareToIgnoreCase("asc") == 0) {
+			Collections.sort(users, (c1, c2) -> {
+				switch (field.toUpperCase()) {
+				case "USERNAME":
+					return c1.getUserName().compareToIgnoreCase(c2.getUserName());
+				case "FNAME":
+					return c1.getFirstName().compareToIgnoreCase(c2.getFirstName());
+				case "LNAME":
+					return c1.getLastName().compareToIgnoreCase(c2.getLastName());
+				default:
+					throw new InvalidParameterException("sort field invalid");
+				}
+			});
+		} else if (direction.compareToIgnoreCase("desc") == 0) {
+			Collections.sort(users, (c1, c2) -> {
+				switch (field.toUpperCase()) {
+				case "USERNAME":
+					return c2.getUserName().compareToIgnoreCase(c1.getUserName());
+				case "FNAME":
+					return c2.getFirstName().compareToIgnoreCase(c1.getFirstName());
+				case "LNAME":
+					return c2.getLastName().compareToIgnoreCase(c1.getLastName());
+				default:
+					throw new InvalidParameterException("sort field invalid");
+				}
+			});
+		} else {
+			throw new InvalidParameterException("sort value must be 'asc' or 'desc'.");
+		}
+		return users ;
+	}
+	
 	@GetMapping("/User/{userName}")
 	public UserResponse getUser(@PathVariable String userName) {
 		List<User> list = new ArrayList<User>();

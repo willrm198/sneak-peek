@@ -58,7 +58,6 @@ public class ClosetController {
 	}
 
 	public List<ClosetItem> sortCloset(List<ClosetItem> closet, String sortDir, String field) {
-		List<ClosetItem> sortedCloset = closet;
 		if (sortDir.compareToIgnoreCase("asc") == 0) {
 			Collections.sort(closet, (c1, c2) -> {
 				switch (field.toUpperCase()) {
@@ -89,6 +88,6 @@ public class ClosetController {
 			throw new InvalidParameterException("sort value must be 'asc' or 'desc'.");
 		}
 
-		return sortedCloset;
+		return closet;
 	}
 }
