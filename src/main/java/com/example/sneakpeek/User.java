@@ -11,14 +11,14 @@ public class User {
 	private String id;
 
 	@Indexed(unique = true)
-	private String userName;
+	private String username;
 	private String firstName;
 	private String lastName;
 
-	public User(String firstName, String lastName, String userName) {
+	public User(String firstName, String lastName, String username) {
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.userName = userName;
+		this.username = username;
 	}
 
 	public User() {
@@ -29,12 +29,12 @@ public class User {
 		return this.id;
 	}
 
-	public String getUserName() {
-		return this.userName;
+	public String getUsername() {
+		return this.username;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUserName(String username) {
+		this.username = username;
 	}
 
 	public String getFirstName() {

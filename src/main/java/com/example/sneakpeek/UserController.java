@@ -26,22 +26,23 @@ public class UserController {
 	private UserRepository userRepository;
 
 	@GetMapping("/User")
-	public UserResponse getUsers(@RequestParam(name = "sortField", required = false, defaultValue = "username") String sortField,
+	public UserResponse getUsers(
+			@RequestParam(name = "sortField", required = false, defaultValue = "username") String sortField,
 			@RequestParam(name = "sortDir", required = false, defaultValue = "asc") String sortDir) {
 		List<User> users = userRepository.findAll();
 		String message = users.isEmpty() ? "No users found." : "User(s) found!";
-		
+
 		List<User> sortedList = sortUsers(users, sortField, sortDir);
 		return new UserResponse(message, sortedList);
 	}
 
 	public List<User> sortUsers(List<User> users, String field, String direction) {
-		
+
 		if (direction.compareToIgnoreCase("asc") == 0) {
 			Collections.sort(users, (c1, c2) -> {
 				switch (field.toUpperCase()) {
 				case "USERNAME":
-					return c1.getUserName().compareToIgnoreCase(c2.getUserName());
+					return c1.getUsername().compareToIgnoreCase(c2.getUsername());
 				case "FNAME":
 					return c1.getFirstName().compareToIgnoreCase(c2.getFirstName());
 				case "LNAME":
@@ -54,7 +55,7 @@ public class UserController {
 			Collections.sort(users, (c1, c2) -> {
 				switch (field.toUpperCase()) {
 				case "USERNAME":
-					return c2.getUserName().compareToIgnoreCase(c1.getUserName());
+					return c2.getUsername().compareToIgnoreCase(c1.getUsername());
 				case "FNAME":
 					return c2.getFirstName().compareToIgnoreCase(c1.getFirstName());
 				case "LNAME":
@@ -66,13 +67,13 @@ public class UserController {
 		} else {
 			throw new InvalidParameterException("sort value must be 'asc' or 'desc'.");
 		}
-		return users ;
+		return users;
 	}
-	
+
 	@GetMapping("/User/{userName}")
 	public UserResponse getUser(@PathVariable String userName) {
 		List<User> list = new ArrayList<User>();
-		User user = userRepository.findByUserName(userName);
+		User user = userRepository.findByUsername(userName);
 		String message;
 
 		if (user != null) {
@@ -91,38 +92,48 @@ public class UserController {
 			throw new InvalidAttributeValueException("firstName cannot be null or integer!");
 		} else if (user.getLastName() == null) {
 			throw new InvalidAttributeValueException("lastName cannot be null or integer!");
-		} else if (user.getUserName() == null) {
+		} else if (user.getUsername() == null) {
 			throw new InvalidAttributeValueException("username cannot be null or integer!");
 		}
 
 		userRepository.save(user);
-		return String.format("User %s created!", user.getUserName().toUpperCase());
+		return String.format("User %s created!", user.getUsername());
 
 	}
 
 	@PutMapping(path = "/User", consumes = "application/json", produces = "application/json")
-	public UserResponse updateUser(@RequestBody User user) {
-		String username = user.getUserName();
-
-		User oldUser = userRepository.findByUserName(username);
-
-		if (username.length() % 2 == 0) {
+	public UserResponse updateUser(@RequestBody User user) throws InvalidAttributeValueException {
+		String username = user.getUsername();
+		List<User> list = new ArrayList<User>();
+		String message = "User updated!";
+		User oldUser = userRepository.findByUsername(username);
+		
+		if (oldUser != null) {
 			oldUser.setFirstName(user.getFirstName());
 			oldUser.setLastName(user.getLastName());
 
 			userRepository.save(oldUser);
+			list.add(oldUser);
 		} else {
-			throw new SecurityException("No Odds Allowed!");
+			message = String.format("User %s not found!", user.getUsername());
 		}
-		List<User> list = new ArrayList<User>();
-		list.add(oldUser);
 
-		return new UserResponse("User updated!", list);
+		return new UserResponse(message, list);
 	}
 
-	@DeleteMapping(path = "/User/{userName}")
-	public void deleteUser(@PathVariable String userName) {
-		String id = userRepository.findByUserName(userName).getId();
-		userRepository.deleteById(id);
+	@DeleteMapping(path = "/User/{username}")
+	public UserResponse deleteUser(@PathVariable String username) {
+		String id, message;
+		User user = userRepository.findByUsername(username);
+		if(user != null) {
+			id = user.getId();
+			userRepository.deleteById(id);
+			message = String.format("User %s deleted!", user.getUsername());
+		} else {
+			message = String.format("User %s not found!", username);
+		}
+		
+		return new UserResponse(message, userRepository.findAll());
+		
 	}
 }

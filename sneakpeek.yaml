@@ -15,11 +15,49 @@ tags:
 
   
 paths: 
+  /createUser:
+    post:
+      tags:
+      - "user"
+      summary: create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+             $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: created
+          content:
+            application/json:
+              schema:
+                type: string
+                example: User Created!
   /User:
     get:
       tags:
       - "user"
-      summary: returns all users
+      summary: returns list of all users
+      parameters: 
+        - in: query
+          name: sortField
+          schema:
+            type: string 
+            default: username
+            enum: 
+             - username
+             - fname
+             - lname
+          description: The field to sort list of users by
+        - in: query
+          name: sortDir
+          schema:
+           type: string
+           default: asc
+           enum: 
+            - asc
+            - desc
       responses: 
         '200':
           description: OK. Returns a response object containing a message and list of users
@@ -27,7 +65,23 @@ paths:
            application/json:
               schema: 
                 $ref: '#/components/schemas/UserResponse'
-                
+    put:
+      tags:
+      - "user"
+      summary: update user
+      requestBody:
+        required: true
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
   /User/{username}:
     get:
       tags:
@@ -47,28 +101,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponse'
-    put:
-      tags:
-      - "user"
-      summary: update user
-      parameters:
-      - in: path
-        name: username
-        required: true
-        description: username of user to update
-        schema: 
-          type: string
-      requestBody:
-        required: true
-        content: 
-          application/json: 
-            schema: 
-              $ref: '#/components/schemas/User'
-      responses:
-        '200':
-          description: updated
-        '403':
-          description: forbidden 
     delete:
       tags:
       - "user"
@@ -83,7 +115,28 @@ paths:
       responses:
         '200': 
           description: User Deleted
-          
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'          
+  /Closet:
+    post:
+      tags:
+      - "closet"
+      summary: adds item to user closet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClosetRequest'
+      responses:
+        '200': 
+          description: item added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClosetResponse'
   /Closet/{username}:
     get:
       tags:
@@ -101,84 +154,55 @@ paths:
           description: List of users items (closet)
           content:
             application/json:
-              schema: 
-                type: array
-                items:
-                  type: object
-                  properties:
-                    ClosetItem:
-                      $ref: '#/components/schemas/ClosetItem'
-    post:
-      tags:
-      - "closet"
-      summary: adds item to user closet
-      parameters: 
-        - in: path
-          name: username
-          required: true
-          description: username of user closet to update
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ClosetItem'
-      responses:
-        '200': 
-          description: item added
-          content:
-            application/json:
               schema:
-                $ref: '#/components/schemas/User'
-  /createUser:
-    post:
-      tags:
-      - "user"
-      summary: create a new user
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-             $ref: '#/components/schemas/User'
-      responses:
-        '200':
-          description: created
-          content:
-            application/json:
-              schema:
-                type: string
+                $ref: '#/components/schemas/ClosetResponse'
               
 components:
   schemas:
     ClosetItem:
       properties: 
-        itemId:
+        itemSize: 
+          type: integer
+          example: 11.5
+        itemBrand:
           type: string
-        userId:
+          example: Nike
+        itemModel:
           type: string
-        itemType: 
-          type: string
-        itemName:
-          type: string
+          example: Uptempo
         itemDescription:
           type: string
-        itemVisibility:
+          example: Nike basketball shoe
+        itemIsVisible:
           type: boolean
-            
+          example: true
+   
+    ClosetRequest:
+      properties:
+        username:
+          type: string
+          example: JDrew81
+        ClosetItem:
+            $ref: '#/components/schemas/ClosetItem'
+      
+    ClosetResponse:
+      properties:
+        message:
+          type: string
+        closet:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClosetItem'
+          
     User:
       properties:
-        id:
-          type: string
         username:
           type: string
         firstName:
           type: string
         lastName:
           type: string
-       
+   
     UserResponse:
       properties:
          message:
@@ -187,9 +211,6 @@ components:
          users:
           type: array
           items:
-            type: object
-            properties:
-              user:
-                $ref: '#/components/schemas/User'
+            $ref: '#/components/schemas/User'
         
     

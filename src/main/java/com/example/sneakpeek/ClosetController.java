@@ -29,7 +29,7 @@ public class ClosetController {
 		String username = closetReq.getUsername();
 		ClosetItem item = closetReq.getClosetItem();
 
-		User user = userRepository.findByUserName(username);
+		User user = userRepository.findByUsername(username);
 		String userID = user.getId();
 
 		ClosetItem newItem = new ClosetItem(userID, item.itemSize, item.itemBrand, item.itemModel, item.itemDescription,
@@ -44,7 +44,7 @@ public class ClosetController {
 			@RequestParam(name = "sortField", required = false, defaultValue = "size") String sortField,
 			@RequestParam(name = "sortDir", required = false, defaultValue = "asc") String sortDir) {
 
-		User user = userRepository.findByUserName(userName);
+		User user = userRepository.findByUsername(userName);
 		List<ClosetItem> closet = itemRepository.findByUserId(user.getId());
 
 		List<ClosetItem> visibleCloset = closet.stream().filter(c -> c.getitemIsVisible() == true)
