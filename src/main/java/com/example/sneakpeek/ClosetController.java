@@ -24,6 +24,11 @@ public class ClosetController {
 	@Autowired
 	private ItemRepository itemRepository;
 
+	/**
+	 * Add item to users closet
+	 * @param closetReq - request object containing username and closet item
+	 * @return response object with message and new 
+	 */
 	@PostMapping(path = "/Closet", consumes = "application/json", produces = "application/json")
 	public ClosetResponse addClosetItem(@RequestBody ClosetRequest closetReq) {
 		String username = closetReq.getUsername();
@@ -39,12 +44,19 @@ public class ClosetController {
 		return new ClosetResponse("Closet Item Added!", itemRepository.findByUserId(userID));
 	}
 
-	@GetMapping(path = "/Closet/{userName}")
-	public ClosetResponse getCloset(@PathVariable("userName") String userName,
+	/**
+	 * Get user's closet by username
+	 * @param username - username of users closet to get
+	 * @param sortField - field to sort list on
+	 * @param sortDir - direction to sort
+	 * @return response object with message and sorted closet
+	 */
+	@GetMapping(path = "/Closet/{username}")
+	public ClosetResponse getCloset(@PathVariable("username") String username,
 			@RequestParam(name = "sortField", required = false, defaultValue = "size") String sortField,
 			@RequestParam(name = "sortDir", required = false, defaultValue = "asc") String sortDir) {
 
-		User user = userRepository.findByUsername(userName);
+		User user = userRepository.findByUsername(username);
 		List<ClosetItem> closet = itemRepository.findByUserId(user.getId());
 
 		List<ClosetItem> visibleCloset = closet.stream().filter(c -> c.getitemIsVisible() == true)
@@ -57,6 +69,13 @@ public class ClosetController {
 		return new ClosetResponse(message, sortedCloset);
 	}
 
+	/**
+	 * Sort closet given field and sort direction
+	 * @param closet - closet list of items
+	 * @param sortDir - direction to sort list
+	 * @param field - field to sort list on
+	 * @return sorted closet
+	 */
 	public List<ClosetItem> sortCloset(List<ClosetItem> closet, String sortDir, String field) {
 		if (sortDir.compareToIgnoreCase("asc") == 0) {
 			Collections.sort(closet, (c1, c2) -> {

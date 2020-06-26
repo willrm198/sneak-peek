@@ -25,6 +25,12 @@ public class UserController {
 	@Autowired
 	private UserRepository userRepository;
 
+	/**
+	 * Gets a list of all users
+	 * @param sortField - the field to sort list by
+	 * @param sortDir - the direction to sort list
+	 * @return response object containing a message and sorted list of users
+	 */
 	@GetMapping("/User")
 	public UserResponse getUsers(
 			@RequestParam(name = "sortField", required = false, defaultValue = "username") String sortField,
@@ -36,8 +42,102 @@ public class UserController {
 		return new UserResponse(message, sortedList);
 	}
 
-	public List<User> sortUsers(List<User> users, String field, String direction) {
+	/**
+	 * Gets a user by username
+	 * @param username - username of user to search for
+	 * @return response object containing message and user 
+	 */
+	@GetMapping("/User/{username}")
+	public UserResponse getUser(@PathVariable String username) {
+		List<User> list = new ArrayList<User>();
+		User user = userRepository.findByUsername(username);
+		String message;
 
+		if (user != null) {
+			list.add(user);
+			message = "User found!";
+		} else {
+			message = "User not found";
+		}
+
+		return new UserResponse(message, list);
+	}
+
+	/**
+	 * Creates a new user
+	 * @param user - user object to create
+	 * @return message string
+	 * @throws InvalidAttributeValueException if field is null or integer
+	 */
+	@PostMapping(path = "/createUser", consumes = "application/json")
+	public String createUser(@RequestBody User user) throws InvalidAttributeValueException {
+		if (user.getFirstName() == null) {
+			throw new InvalidAttributeValueException("firstName cannot be null or integer!");
+		} else if (user.getLastName() == null) {
+			throw new InvalidAttributeValueException("lastName cannot be null or integer!");
+		} else if (user.getUsername() == null) {
+			throw new InvalidAttributeValueException("username cannot be null or integer!");
+		}
+
+		userRepository.save(user);
+		return String.format("User %s created!", user.getUsername());
+
+	}
+
+	/**
+	 * Updates a user
+	 * @param user - user object with updated fields
+	 * @return response object containing message and updated user 
+	 */
+	@PutMapping(path = "/User", consumes = "application/json", produces = "application/json")
+	public UserResponse updateUser(@RequestBody User user) {
+		String username = user.getUsername();
+		List<User> list = new ArrayList<User>();
+		String message = "User updated!";
+		User oldUser = userRepository.findByUsername(username);
+
+		if (oldUser != null) {
+			oldUser.setFirstName(user.getFirstName());
+			oldUser.setLastName(user.getLastName());
+
+			userRepository.save(oldUser);
+			list.add(oldUser);
+		} else {
+			message = String.format("User %s not found!", user.getUsername());
+		}
+
+		return new UserResponse(message, list);
+	}
+
+	/**
+	 * Delete a user
+	 * @param username - username of user to delete
+	 * @return
+	 */
+	@DeleteMapping(path = "/User/{username}")
+	public UserResponse deleteUser(@PathVariable String username) {
+		String id, message;
+		User user = userRepository.findByUsername(username);
+		if (user != null) {
+			id = user.getId();
+			userRepository.deleteById(id);
+			message = String.format("User %s deleted!", user.getUsername());
+		} else {
+			message = String.format("User %s not found!", username);
+		}
+
+		return new UserResponse(message, userRepository.findAll());
+
+	}
+
+	/**
+	 * Sort list of users by a given field and sort direction
+	 * @param users - list of users
+	 * @param field - field to sort list on
+	 * @param direction - direction to sort list
+	 * @return sorted user list
+	 */
+	public List<User> sortUsers(List<User> users, String field, String direction) {
 		if (direction.compareToIgnoreCase("asc") == 0) {
 			Collections.sort(users, (c1, c2) -> {
 				switch (field.toUpperCase()) {
@@ -68,72 +168,5 @@ public class UserController {
 			throw new InvalidParameterException("sort value must be 'asc' or 'desc'.");
 		}
 		return users;
-	}
-
-	@GetMapping("/User/{userName}")
-	public UserResponse getUser(@PathVariable String userName) {
-		List<User> list = new ArrayList<User>();
-		User user = userRepository.findByUsername(userName);
-		String message;
-
-		if (user != null) {
-			list.add(user);
-			message = "User found!";
-		} else {
-			message = "User not found";
-		}
-
-		return new UserResponse(message, list);
-	}
-
-	@PostMapping(path = "/createUser", consumes = "application/json")
-	public String createUser(@RequestBody User user) throws InvalidAttributeValueException {
-		if (user.getFirstName() == null) {
-			throw new InvalidAttributeValueException("firstName cannot be null or integer!");
-		} else if (user.getLastName() == null) {
-			throw new InvalidAttributeValueException("lastName cannot be null or integer!");
-		} else if (user.getUsername() == null) {
-			throw new InvalidAttributeValueException("username cannot be null or integer!");
-		}
-
-		userRepository.save(user);
-		return String.format("User %s created!", user.getUsername());
-
-	}
-
-	@PutMapping(path = "/User", consumes = "application/json", produces = "application/json")
-	public UserResponse updateUser(@RequestBody User user) throws InvalidAttributeValueException {
-		String username = user.getUsername();
-		List<User> list = new ArrayList<User>();
-		String message = "User updated!";
-		User oldUser = userRepository.findByUsername(username);
-		
-		if (oldUser != null) {
-			oldUser.setFirstName(user.getFirstName());
-			oldUser.setLastName(user.getLastName());
-
-			userRepository.save(oldUser);
-			list.add(oldUser);
-		} else {
-			message = String.format("User %s not found!", user.getUsername());
-		}
-
-		return new UserResponse(message, list);
-	}
-
-	@DeleteMapping(path = "/User/{username}")
-	public UserResponse deleteUser(@PathVariable String username) {
-		String id, message;
-		User user = userRepository.findByUsername(username);
-		if(user != null) {
-			id = user.getId();
-			userRepository.deleteById(id);
-			message = String.format("User %s deleted!", user.getUsername());
-		} else {
-			message = String.format("User %s not found!", username);
-		}
-		
-		return new UserResponse(message, userRepository.findAll());
-		
 	}
 }
