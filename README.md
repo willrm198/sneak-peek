@@ -16,8 +16,11 @@ Windows
 
 
 ## Run Project
-Start mongodb 
+#### Start mongodb 
 ```
 brew services start mongodb-community@4.2
 ```
-Start Spring project
+#### Start Spring project
+```
+./gradlew bootRun;
+```
